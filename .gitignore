@@ -1,0 +1,8 @@
+dbt_packages/
+logs/
+target/
+.vscode/
+.python-version
+package-lock.yml
+dbt_takehome.duckdb
+.DS_Store
