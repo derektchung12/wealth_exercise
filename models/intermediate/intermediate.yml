@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: "Fact table containing one row per order with aggregated metrics"
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - unique
+          - not_null
+      - name: contact_id
+        description: "Foreign key to contacts"
+      - name: order_date
+        description: "Timestamp when the order was placed"
+      - name: order_status
+        description: "Current status of the order (completed, cancelled, etc.)"
+      - name: total_amount
+        description: "Total amount paid for the order"
+      - name: total_quantity
+        description: "Total quantity of items in the order"
+      - name: list_amount
+        description: "Total list price of all items before discounts"
+      - name: is_discount_applied
+        description: "Boolean flag indicating if a discount was applied"
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_amount >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "list_amount >= total_amount OR is_discount_applied = TRUE"
+
+  - name: dim_contacts
+    description: "Dimension table containing one row per contact with customer metrics"
+    columns:
+      - name: contact_id
+        description: "Unique identifier for each contact"
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: "Contact's first name"
+      - name: last_name
+        description: "Contact's last name"
+      - name: total_completed_orders
+        description: "Count of completed orders for this contact"
+      - name: total_spend
+        description: "Total amount spent on completed orders"
+      - name: avg_order_value
+        description: "Average order value for completed orders. NULL for non-customers by design."
+      - name: is_customer
+        description: "True if contact has at least one completed order"
+      - name: is_repeat_customer
+        description: "True if contact has more than one completed order"
+      - name: customer_since_date
+        description: "Date of first completed order. NULL for non-customers by design."
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_spend >= 0"
