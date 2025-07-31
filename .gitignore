@@ -6,3 +6,5 @@ target/
 package-lock.yml
 dbt_takehome.duckdb
 .DS_Store
+
+venv/
